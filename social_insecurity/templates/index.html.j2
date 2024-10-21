@@ -1,5 +1,6 @@
 {% extends "base.html.j2" %}
 {% block content %}
+  {% autoescape true %}
   <!-- Jumbotron -->
   <div class="bg-light p-5 rounded mx-3 mb-4">
     <div class="container">
@@ -45,4 +46,5 @@
       </div>
     </div>
   </div>
+  {% endautoescape %}
 {% endblock content %}

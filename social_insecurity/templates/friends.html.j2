@@ -1,5 +1,6 @@
 {% extends "base.html.j2" %}
 {% block content %}
+  {% autoescape true %}
   <div class="container-flex justify-content-center">
     <div class="row justify-content-center">
       <!-- Add friend card -->
@@ -25,7 +26,7 @@
               <ul class="list-group list-group-flush">
                 {% for friend in friends %}
                   <li class="list-group-item">
-                    <a href={{ url_for('profile', username=friend.username) }}>{{ friend.username }}</a>
+                    <a href={{ url_for('profile') }}>{{ friend.username }}</a>
                   </li>
                 {% endfor %}
               </ul>
@@ -35,4 +36,5 @@
       {% endif %}
     </div>
   </div>
+  {% endautoescape %}
 {% endblock content %}

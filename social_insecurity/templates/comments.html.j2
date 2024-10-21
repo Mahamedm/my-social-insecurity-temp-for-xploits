@@ -1,5 +1,7 @@
 {% extends "base.html.j2" %}
+
 {% block content %}
+  {% autoescape true %}
   <div class="container-flex justify-content-center">
     <div class="row justify-content-center">
       <!-- Comment creation card -->
@@ -11,14 +13,14 @@
             <div class="card mb-3">
               <div class="card-header">
                 <div class="row align-items-center">
-                  <a class="col-4" href={{ url_for('profile', username=post.username) }}><span class="fa fa-user me-1" aria-hidden="true"></span>{{ post.username }}</a>
+                  <a class="col-4" href={{ url_for('profile') }}><span class="fa fa-user me-1" aria-hidden="true"></span>{{ post.username }}</a>
                   <span class="col-8 text-right">{{ post.creation_time }}</span>
                 </div>
               </div>
               <div class="card-body">
-                <p class="card-text">{{ post.content }}</p>
+                <p class="card-text">{{ post.content | e }}</p>
                 {% if post.image %}
-                  <img src={{ url_for('uploads', filename=post.image) }} alt={{ post.image }} class="img-fluid mb-3">
+                  <img src={{ url_for('uploads', filename=post.image | urlencode) }} alt={{ post.image | e}} class="img-fluid mb-3">
                 {% endif %}
               </div>
             </div>
@@ -34,16 +36,17 @@
           <div class="card mb-3">
             <div class="card-header">
               <div class="row align-items-center">
-                <a class="col-4" href={{ url_for('profile', username=comment.username) }}><span class="fa fa-user me-1" aria-hidden="true"></span>{{ comment.username }}</a>
+                <a class="col-4" href={{ url_for('profile') }}><span class="fa fa-user me-1" aria-hidden="true"></span>{{ comment.username }}</a>
                 <span class="col-8 text-right">{{ comment.creation_time }}</span>
               </div>
             </div>
             <div class="card-body">
-              <p class="card-text">{{ comment.comment }}</p>
+              <p class="card-text">{{ comment.comment | e }}</p>
             </div>
           </div>
         {% endfor %}
       </div>
     </div>
   </div>
+  {% endautoescape %}
 {% endblock content %}

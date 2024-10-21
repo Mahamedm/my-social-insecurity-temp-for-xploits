@@ -1,5 +1,6 @@
 {% extends "base.html.j2" %}
 {% block content %}
+  {% autoescape true %}
   <div class="container-flex justify-content-center">
     <div class="row justify-content-center">
       <!-- Profile card -->
@@ -18,43 +19,43 @@
                 <li class="list-group-item">
                   <div class="row">
                     <span class="col-sm-2">Name:</span>
-                    <span class="text-right col-sm-10 text-muted">{{ user.first_name }} {{ user.last_name }}</span>
+                    <span class="text-right col-sm-10 text-muted">{{ user.first_name }} {{ user.last_name | e }}</span>
                   </div>
                 </li>
                 <li class="list-group-item d-inline">
                   <div class="row">
                     <span class="col-sm-2">Education:</span>
-                    <span class="text-right col-sm-10 text-muted">{{ user.education }}</span>
+                    <span class="text-right col-sm-10 text-muted">{{ user.education | e }}</span>
                   </div>
                 </li>
                 <li class="list-group-item d-inline">
                   <div class="row">
                     <span class="col-sm-2">Employment:</span>
-                    <span class="text-right col-sm-10 text-muted">{{ user.employment }}</span>
+                    <span class="text-right col-sm-10 text-muted">{{ user.employment | e }}</span>
                   </div>
                 </li>
                 <li class="list-group-item d-inline">
                   <div class="row">
                     <span class="col-sm-2">Favorite song:</span>
-                    <span class="text-right col-sm-10 text-muted">{{ user.music }}</span>
+                    <span class="text-right col-sm-10 text-muted">{{ user.music | e }}</span>
                   </div>
                 </li>
                 <li class="list-group-item d-inline">
                   <div class="row">
                     <span class="col-sm-2">Favorite movie:</span>
-                    <span class="text-right col-sm-10 text-muted">{{ user.movie }}</span>
+                    <span class="text-right col-sm-10 text-muted">{{ user.movie | e }}</span>
                   </div>
                 </li>
                 <li class="list-group-item d-inline">
                   <div class="row">
                     <span class="col-sm-2">Nationality:</span>
-                    <span class="text-right col-sm-10 text-muted">{{ user.nationality }}</span>
+                    <span class="text-right col-sm-10 text-muted">{{ user.nationality | e }}</span>
                   </div>
                 </li>
                 <li class="list-group-item d-inline">
                   <div class="row">
                     <span class="col-sm-2">Birthday:</span>
-                    <span class="text-right col-sm-10 text-muted">{{ user.birthday }}</span>
+                    <span class="text-right col-sm-10 text-muted">{{ user.birthday | e}}</span>
                   </div>
                 </li>
               </ul>
@@ -76,6 +77,7 @@
       </div>
     </div>
   </div>
+  {% endautoescape %}
 {% endblock content %}
 {% block script %}
   <script>
