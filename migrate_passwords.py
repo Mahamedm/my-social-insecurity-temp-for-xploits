@@ -17,6 +17,7 @@ def migrate_passwords():
                 q = """UPDATE Users SET password = ? WHERE id = ?"""
                 # Update the password in the database with the hashed version
                 sqlite.query(
+                    q,
                     hashed_password, 
                     user_id
                 )
