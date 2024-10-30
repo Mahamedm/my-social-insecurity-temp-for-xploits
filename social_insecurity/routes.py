@@ -4,19 +4,23 @@ This file contains the routes for the application. It is imported by the social_
 It also contains the SQL queries used for communicating with the database.
 """
 
-from pathlib import Path
 import sqlite3
+from pathlib import Path
+
 # import os
 # from dotenv import load_dotenv
 from flask import current_app as app
-from flask import flash, redirect, render_template, send_from_directory, url_for, session
-
-from social_insecurity import sqlite
-from social_insecurity.forms import CommentsForm, FriendsForm, IndexForm, PostForm, ProfileForm
-from social_insecurity.config import *
-
+from flask import flash, redirect, render_template, send_from_directory, session, url_for
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_login import current_user, login_required, login_user, logout_user
+
+from social_insecurity import sqlite
+from social_insecurity.config import *
+from social_insecurity.database import User
+from social_insecurity.forms import CommentsForm, FriendsForm, IndexForm, PostForm, ProfileForm
+
+from . import bcrypt
 
 # load_dotenv()
 
@@ -41,13 +45,23 @@ def index():
         get_user = "SELECT * FROM Users WHERE username = ?;"
         user = sqlite.query(get_user, login_form.username.data, one=True)
 
-        if user is None or user["password"] != login_form.password.data:
+        if user is None:
             flash("Invalid username or password!", category="warning")
         else:
-            session['username'] = user['username']
-            return redirect(url_for("stream"))
+            user_data = User(
+                id = user["id"],
+                username = user["username"],
+                password = user["password"]
+            )
+
+            if not bcrypt.check_password_hash(user_data.password, login_form.password.data):
+                flash("Sorry, wrong username or password !", category="warning")
+            else:
+                login_user(user_data, remember=login_form.remember_me.data)
+                return redirect(url_for("stream"))
 
     elif register_form.is_submitted() and register_form.submit.data:
+        password_hashed = bcrypt.generate_password_hash(register_form.password.data).decode("utf-8")
         check_user = """
             SELECT id FROM Users WHERE username = ?;
         """
@@ -68,7 +82,7 @@ def index():
                 register_form.username.data,
                 register_form.first_name.data,
                 register_form.last_name.data,
-                register_form.password.data,
+                password_hashed,
             )
             flash("User successfully created!", category="success")
             return redirect(url_for("index"))
@@ -77,6 +91,7 @@ def index():
 
 
 @app.route("/stream", methods=["GET", "POST"])
+@login_required
 def stream():
     """Provides the stream page for the application.
 
@@ -84,8 +99,12 @@ def stream():
 
     Otherwise, it reads the username from the URL and displays all posts from the user and their friends.
     """
-    username = session.get('username')
-    if not username:
+    username = current_user.username
+    get_user = "SELECT * FROM Users WHERE username = ?;"
+    user = sqlite.query(get_user, username, one=True)
+
+    if not user:
+        flash("User not found", category="warning")
         return redirect(url_for('index'))
     
     post_form = PostForm()
@@ -118,8 +137,9 @@ def stream():
 
 
 @app.route("/comments/<int:post_id>", methods=["GET", "POST"])
+@login_required
 def comments(post_id: int):
-    username = session.get('username')
+    username = current_user.username
     if not username:
         return redirect(url_for('index'))
     
@@ -159,8 +179,9 @@ def comments(post_id: int):
 
 
 @app.route("/friends", methods=["GET", "POST"])
+@login_required
 def friends():
-    username = session.get('username')
+    username = current_user.username
     if not username:
         return redirect(url_for('index'))
     """Provides the friends page for the application.
@@ -200,8 +221,9 @@ def friends():
 
 
 @app.route("/profile", methods=["GET", "POST"])
+@login_required
 def profile():
-    username = session.get('username')
+    username = current_user.username
     if not username:
         return redirect(url_for('index'))
     """Provides the profile page for the application.
@@ -230,19 +252,25 @@ def profile():
             profile_form.birthday.data,
             username,
         )
+        flash("Profile updated successfully!", category="success")
+        return redirect(url_for("profile"))
+    
     return render_template("profile.html.j2", title="Profile", username=username, user=user, form=profile_form)
 
 
 
 
 @app.route("/uploads/<string:filename>")
+@login_required
 def uploads(filename):
     """Provides an endpoint for serving uploaded files."""
     return send_from_directory(Path(app.instance_path) / app.config["UPLOADS_FOLDER_PATH"], filename)
 
 @app.route("/logout")
+@login_required
 def logout():
-    session.clear()
+    logout_user()
+    #session.clear()
     return redirect(url_for('index'))
 
 @app.errorhandler(429)
