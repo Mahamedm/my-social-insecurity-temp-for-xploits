@@ -29,6 +29,7 @@ from wtforms import (
     SubmitField,
     TextAreaField,
 )
+from wtforms.validators import DataRequired, InputRequired, Optional
 
 # Defines all forms in the application, these will be instantiated by the template,
 # and the routes.py will read the values of the fields
@@ -41,8 +42,8 @@ from wtforms import (
 class LoginForm(FlaskForm):
     """Provides the login form for the application."""
 
-    username = StringField(label="Username", render_kw={"placeholder": "Username"})
-    password = PasswordField(label="Password", render_kw={"placeholder": "Password"})
+    username = StringField(label="Username", render_kw={"placeholder": "Username"}, validators=[DataRequired()])
+    password = PasswordField(label="Password", render_kw={"placeholder": "Password"}, validators=[DataRequired()])
     remember_me = BooleanField(
         label="Remember me"
     )  # TODO: It would be nice to have this feature implemented, probably by using cookies
@@ -52,11 +53,11 @@ class LoginForm(FlaskForm):
 class RegisterForm(FlaskForm):
     """Provides the registration form for the application."""
 
-    first_name = StringField(label="First Name", render_kw={"placeholder": "First Name"})
-    last_name = StringField(label="Last Name", render_kw={"placeholder": "Last Name"})
-    username = StringField(label="Username", render_kw={"placeholder": "Username"})
-    password = PasswordField(label="Password", render_kw={"placeholder": "Password"})
-    confirm_password = PasswordField(label="Confirm Password", render_kw={"placeholder": "Confirm Password"})
+    first_name = StringField(label="First Name", render_kw={"placeholder": "First Name"}, validators=[InputRequired()])
+    last_name = StringField(label="Last Name", render_kw={"placeholder": "Last Name"}, validators=[InputRequired()])
+    username = StringField(label="Username", render_kw={"placeholder": "Username"}, validators=[InputRequired()])
+    password = PasswordField(label="Password", render_kw={"placeholder": "Password"}, validators=[InputRequired()])
+    confirm_password = PasswordField(label="Confirm Password", render_kw={"placeholder": "Confirm Password"}, validators=[InputRequired()])
     submit = SubmitField(label="Sign Up")
 
 
@@ -92,10 +93,10 @@ class FriendsForm(FlaskForm):
 class ProfileForm(FlaskForm):
     """Provides the profile form for the application."""
 
-    education = StringField(label="Education", render_kw={"placeholder": "Highest education"})
-    employment = StringField(label="Employment", render_kw={"placeholder": "Current employment"})
-    music = StringField(label="Favorite song", render_kw={"placeholder": "Favorite song"})
-    movie = StringField(label="Favorite movie", render_kw={"placeholder": "Favorite movie"})
-    nationality = StringField(label="Nationality", render_kw={"placeholder": "Your nationality"})
-    birthday = DateField(label="Birthday", default=datetime.now())
+    education = StringField(label="Education", render_kw={"placeholder": "Highest education"}, validators=[Optional()])
+    employment = StringField(label="Employment", render_kw={"placeholder": "Current employment"}, validators=[Optional()])
+    music = StringField(label="Favorite song", render_kw={"placeholder": "Favorite song"}, validators=[Optional()])
+    movie = StringField(label="Favorite movie", render_kw={"placeholder": "Favorite movie"}, validators=[Optional()])
+    nationality = StringField(label="Nationality", render_kw={"placeholder": "Your nationality"}, validators=[Optional()])
+    birthday = DateField(label="Birthday", default=datetime.now(), validators=[Optional()])
     submit = SubmitField(label="Update Profile")
