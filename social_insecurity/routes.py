@@ -293,3 +293,8 @@ def ratelimit_handler(e):
 def ratelimit_handler(e):
     flash("File size exceeds the maximum allowed limit of 5 MB.", category="warning")
     return redirect(url_for("stream"))
+
+@app.errorhandler(401)
+def Unauthorized_handler(e):
+    flash("Please login to continue.", category="warning")
+    return redirect(url_for("index"))

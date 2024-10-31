@@ -23,7 +23,6 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY") 
     if not SECRET_KEY:
         raise ValueError("No SECRET_KEY set for Flask application. Did you forget to add it to .env?")
-    print(f"SECRET_KEY is loaded: {SECRET_KEY}")
     #print(SECRET_KEY)
     SQLITE3_DATABASE_PATH = "sqlite3.db"  # Path relative to the Flask instance folder
     UPLOADS_FOLDER_PATH = "uploads"  # Path relative to the Flask instance folder
