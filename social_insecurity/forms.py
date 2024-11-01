@@ -29,7 +29,7 @@ from wtforms import (
     SubmitField,
     TextAreaField,
 )
-from wtforms.validators import DataRequired, InputRequired, Optional
+from wtforms.validators import DataRequired, InputRequired, Length, Optional, Regexp
 
 # Defines all forms in the application, these will be instantiated by the template,
 # and the routes.py will read the values of the fields
@@ -56,7 +56,12 @@ class RegisterForm(FlaskForm):
     first_name = StringField(label="First Name", render_kw={"placeholder": "First Name"}, validators=[InputRequired()])
     last_name = StringField(label="Last Name", render_kw={"placeholder": "Last Name"}, validators=[InputRequired()])
     username = StringField(label="Username", render_kw={"placeholder": "Username"}, validators=[InputRequired()])
-    password = PasswordField(label="Password", render_kw={"placeholder": "Password"}, validators=[InputRequired()])
+    password = PasswordField(label="Password", render_kw={"placeholder": "Password"}, validators=[InputRequired(), 
+                                                 Length(min=8, message="Password must be at least 8 characters"),
+                                                 Regexp(r".*[A-Z].*", message="Password must contain at least one uppercase letter"),
+                                                 Regexp(r".*\d.*", message="Password must contain at least one number"),
+                                                 Regexp(r".*[!@#$%^&*()-_=+\|[]{};:/?.>]", 
+                                                        message="Password must contain at least one special character (e.g., ! @ # $ % ^ & * ( ) - _ = + \\ | [ ] { } ; : / ? . >).")])
     confirm_password = PasswordField(label="Confirm Password", render_kw={"placeholder": "Confirm Password"}, validators=[InputRequired()])
     submit = SubmitField(label="Sign Up")
 
