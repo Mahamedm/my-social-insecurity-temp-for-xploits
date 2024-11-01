@@ -4,8 +4,6 @@ from social_insecurity import bcrypt, create_app, sqlite
 def migrate_passwords():
     app = create_app()
     with app.app_context():
-        #db = sqlite.connection
-        #users = db.execute("SELECT id, password FROM Users").fetchall()
         users = sqlite.connection.execute("SELECT id, password FROM Users").fetchall()
         print(users)
 
@@ -15,8 +13,8 @@ def migrate_passwords():
                 hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
 
                 q = """UPDATE Users SET password = ? WHERE id = ?"""
-                # Update the password in the database with the hashed version
                 sqlite.query(
+                    q,
                     hashed_password, 
                     user_id
                 )

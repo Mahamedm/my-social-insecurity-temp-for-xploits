@@ -10,7 +10,7 @@ from pathlib import Path
 # import os
 # from dotenv import load_dotenv
 from flask import current_app as app
-from flask import flash, redirect, render_template, send_from_directory, session, url_for
+from flask import flash, redirect, render_template, send_from_directory, url_for
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_login import current_user, login_required, login_user, logout_user
@@ -41,6 +41,7 @@ def index():
     login_form = index_form.login
     register_form = index_form.register
 
+
     if login_form.is_submitted() and login_form.submit.data:
         get_user = "SELECT * FROM Users WHERE username = ?;"
         user = sqlite.query(get_user, login_form.username.data, one=True)
@@ -55,12 +56,13 @@ def index():
             )
 
             if not bcrypt.check_password_hash(user_data.password, login_form.password.data):
-                flash("Sorry, wrong username or password !", category="warning")
+                flash("Invalid username or password!", category="warning")
             else:
                 login_user(user_data, remember=login_form.remember_me.data)
                 return redirect(url_for("stream"))
 
-    elif register_form.is_submitted() and register_form.submit.data:
+    elif register_form.validate_on_submit():
+        #and register_form.submit.data:
         password_hashed = bcrypt.generate_password_hash(register_form.password.data).decode("utf-8")
         check_user = """
             SELECT id FROM Users WHERE username = ?;
