@@ -39,7 +39,7 @@ def index():
     """
 
     if current_user.is_authenticated:
-        return redirect(url_for("stream", username = current_user.username))
+        return redirect(url_for("stream"))
         
     index_form = IndexForm()
     login_form = index_form.login
@@ -108,7 +108,7 @@ def stream():
     get_user = "SELECT * FROM Users WHERE username = ?;"
     user = sqlite.query(get_user, username, one=True)
 
-    if not user:
+    if not current_user.is_authenticated:
         flash("User not found", category="warning")
         return redirect(url_for('index'))
     
@@ -145,7 +145,7 @@ def stream():
 @login_required
 def comments(post_id: int):
     username = current_user.username
-    if not username:
+    if not current_user.is_authenticated:
         return redirect(url_for('index'))
     
     """Provides the comments page for the application.
@@ -187,7 +187,7 @@ def comments(post_id: int):
 @login_required
 def friends():
     username = current_user.username
-    if not username:
+    if not current_user.is_authenticated:
         return redirect(url_for('index'))
     """Provides the friends page for the application.
 
@@ -229,7 +229,7 @@ def friends():
 @login_required
 def profile():
     username = current_user.username
-    if not username:
+    if not current_user.is_authenticated:
         return redirect(url_for('index'))
     """Provides the profile page for the application.
 
@@ -275,7 +275,6 @@ def uploads(filename):
 @login_required
 def logout():
     logout_user()
-    #session.clear()
     return redirect(url_for('index'))
 
 @app.errorhandler(429)
