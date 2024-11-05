@@ -40,7 +40,7 @@ def create_app(test_config=None) -> Flask:
     def load_user(user_id: str) -> Optional[User]:
         db = sqlite.connection
         user_query = "SELECT * FROM Users WHERE id = ?;"
-        user_data = db.execute(user_query, (user_id)).fetchone()
+        user_data = db.execute(user_query, (user_id,)).fetchone()
 
         if user_data:
             return User(
