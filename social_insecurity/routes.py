@@ -6,7 +6,9 @@ It also contains the SQL queries used for communicating with the database.
 
 import sqlite3
 from pathlib import Path
-
+from werkzeug.utils import secure_filename
+import uuid
+from pathlib import Path
 # import os
 # from dotenv import load_dotenv
 from flask import current_app as app
@@ -19,7 +21,7 @@ from social_insecurity import sqlite
 from social_insecurity.config import *
 from social_insecurity.database import User
 from social_insecurity.forms import CommentsForm, FriendsForm, IndexForm, PostForm, ProfileForm
-
+from social_insecurity.utils import *
 from . import bcrypt
 
 # load_dotenv()
@@ -28,7 +30,7 @@ limiter = Limiter(get_remote_address, app=app)
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/index", methods=["GET", "POST"])
-@limiter.limit("50 per day")
+@limiter.limit("1000 per day")
 def index():
     """Provides the index page for the application.
 
@@ -119,15 +121,25 @@ def stream():
     if post_form.is_submitted():
         image_filename = None
         if post_form.image.data:
-            path = Path(app.instance_path) / app.config["UPLOADS_FOLDER_PATH"] / post_form.image.data.filename
-            post_form.image.data.save(path)
+            file = post_form.image.data
+            filename = file.filename
+            if allowed_file(filename) and allowed_mime_type(file.stream):
+                unique_filename = f"{uuid.uuid4().hex}_{secure_filename(filename)}"
+                upload_path = Path(app.instance_path) / app.config["UPLOADS_FOLDER_PATH"] / unique_filename
+
+                file.save(upload_path)
+
+                image_filename = unique_filename
+            else:
+                flash("Invalid file type or format!", category="warning")
+                return redirect(url_for("stream"))
 
         insert_post = """
             INSERT INTO Posts (u_id, content, image, creation_time)
             VALUES (?, ?, ?, CURRENT_TIMESTAMP);
         """
         sqlite.query(insert_post, user["id"], post_form.content.data, image_filename)
-        return redirect(url_for("stream", username=username))
+        return redirect(url_for("stream"))
 
     get_posts = """
         SELECT p.*, u.*, (SELECT COUNT(*) FROM Comments WHERE p_id = p.id) AS cc
@@ -280,3 +292,13 @@ def logout():
 @app.errorhandler(429)
 def ratelimit_handler(e):
     return render_template("429.html.j2"), 429
+
+@app.errorhandler(413)
+def ratelimit_handler(e):
+    flash("File size exceeds the maximum allowed limit of 5 MB.", category="warning")
+    return redirect(url_for("stream"))
+
+@app.errorhandler(401)
+def Unauthorized_handler(e):
+    flash("Please login to continue.", category="warning")
+    return redirect(url_for("index"))
