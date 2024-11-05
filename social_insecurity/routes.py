@@ -37,6 +37,10 @@ def index():
 
     If no form was submitted, it simply renders the index page.
     """
+
+    if current_user.is_authenticated:
+        return redirect(url_for("stream", username = current_user.username))
+        
     index_form = IndexForm()
     login_form = index_form.login
     register_form = index_form.register
@@ -62,7 +66,6 @@ def index():
                 return redirect(url_for("stream"))
 
     elif register_form.validate_on_submit():
-        #and register_form.submit.data:
         password_hashed = bcrypt.generate_password_hash(register_form.password.data).decode("utf-8")
         check_user = """
             SELECT id FROM Users WHERE username = ?;

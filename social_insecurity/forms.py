@@ -60,8 +60,8 @@ class RegisterForm(FlaskForm):
                                                  Length(min=8, message="Password must be at least 8 characters"),
                                                  Regexp(r".*[A-Z].*", message="Password must contain at least one uppercase letter"),
                                                  Regexp(r".*\d.*", message="Password must contain at least one number"),
-                                                 Regexp(r".*[!@#$%^&*()-_=+\|[]{};:/?.>]", 
-                                                        message="Password must contain at least one special character (e.g., ! @ # $ % ^ & * ( ) - _ = + \\ | [ ] { } ; : / ? . >).")])
+                                                 Regexp(r".*[!@#$%^&*()\-_=\+\\|[\]{};:/?.><].*", 
+                                                        message="Password must contain at least one special character (e.g., ! @ # $ % ^ & * ( ) - _ = + \\ | [ ] { } ; : / ? . < >).")])
     confirm_password = PasswordField(label="Confirm Password", render_kw={"placeholder": "Confirm Password"}, validators=[InputRequired()])
     submit = SubmitField(label="Sign Up")
 
